@@ -1,0 +1,103 @@
+import os
+import time
+from aws_encryption_sdk import StreamEncryptor, StreamDecryptor
+from aws_encryption_sdk.key_providers.kms import KMSMasterKeyProvider
+
+def print_red(text):
+    print(f'\033[91m{text}\033[0m')
+
+def encrypt_file(file_path, kms_key_id, region):
+    # Placeholder: replace with real encryption logic
+    return True
+
+def decrypt_file(file_path, destination_path, kms_key_id, region):
+    # Placeholder: replace with real decryption logic
+    return True
+
+def main():
+    while True:
+        # User input for file/folder path
+        file_or_folder_path = input("Enter folder or file path to encrypt/decrypt: ")
+        while not os.path.exists(file_or_folder_path):
+            print_red("File or folder doesn't exist.")
+            if input("Try again or press 'x' to exit: ").lower() == 'x':
+                return
+            file_or_folder_path = input("Enter folder or file path to encrypt/decrypt: ")
+
+        # Encrypt or Decrypt
+        operation = input("Do you want to encrypt or decrypt? (encrypt/decrypt): ")
+
+        # Destination folder for decryption
+        destination_path = ''
+        if operation == 'decrypt':
+            destination_path = input("Enter destination folder path for decrypted files: ")
+
+        debug_mode = input("Run in debug mode? (yes/no): ").lower() == 'yes'
+        
+        skipped_extensions = []
+        if os.path.isdir(file_or_folder_path):
+            skipped_extensions = input("Enter comma separated file extensions to skip (optional): ").split(",")
+
+        delete_after = input("Delete source file after encryption? (yes/no): ").lower() == 'yes'
+        kms_key_id = input("Enter data file or AWS KMS key: ")
+        aws_region = input("Enter AWS region: ")
+        user_id = input("Enter user eid (optional, press enter to use ROBOUSER): ") or "ROBOUSER"
+
+        all_files = []
+        if os.path.isdir(file_or_folder_path):
+            print("Counting files before processing...")
+            all_files = [os.path.join(file_or_folder_path, f) for f in os.listdir(file_or_folder_path) if os.path.isfile(os.path.join(file_or_folder_path, f)) and not any(f.endswith(ext) for ext in skipped_extensions)]
+            print(f"Found {len(all_files)} files. Continue? (yes/no): ")
+            proceed = input().lower()
+            if proceed != 'yes':
+                print("BYE for now, have a nice day!")
+                return
+        else:
+            all_files = [file_or_folder_path]
+
+        start_time = time.time()
+        processed_files, failed_files = 0, 0
+        failure_report = []
+
+        for file_path in all_files:
+            if debug_mode:
+                print(f"Processing {file_path}")
+
+            success = False
+            if operation == "encrypt":
+                success = encrypt_file(file_path, kms_key_id, aws_region)
+            elif operation == "decrypt":
+                success = decrypt_file(file_path, destination_path, kms_key_id, aws_region)
+
+            if success:
+                processed_files += 1
+                if delete_after and operation == "encrypt":
+                    os.remove(file_path)
+            else:
+                failed_files += 1
+                failure_report.append(file_path)
+
+        end_time = time.time()
+
+        with open(f"{user_id}_failed_files_{int(time.time())}.txt", 'w') as fail_report_file:
+            for item in failure_report:
+                fail_report_file.write(f"{item}\n")
+
+        with open(f"{user_id}_final_report_{int(time.time())}.txt", 'w') as report_file:
+            report_file.write(f"User ID: {user_id}\n")
+            report_file.write(f"Started at: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))}\n")
+            report_file.write(f"Ended at: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}\n")
+            report_file.write(f"Processed files: {processed_files}/{len(all_files)}\n")
+            report_file.write(f"Failed files: {failed_files}\n")
+
+        print(f"Processed {processed_files}/{len(all_files)} files with {failed_files} failures. Detailed reports saved.")
+
+        choice = input("Press 'x' to exit or 's' to go to the main menu: ").lower()
+        if choice == 'x':
+            print("Good Bye!")
+            return
+        else:
+            continue
+
+if __name__ == '__main__':
+    main()
