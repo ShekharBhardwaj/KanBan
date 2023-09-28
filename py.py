@@ -4,11 +4,13 @@ import csv
 def analyze_directory(directory_path, extension_list):
     # Initialize counters and dictionaries
     total_files = 0
+    total_folders = 0
     total_size = 0
     extension_counts = {}
     extension_sizes = {}
     skipped_extensions = {}
     skipped_files_size = 0
+    ready_file_paths = []  # Store absolute paths of ready files
     encryption_rate = 0.2833  # GB/minute
 
     # Convert extension list to lowercase
@@ -16,9 +18,10 @@ def analyze_directory(directory_path, extension_list):
 
     # Walk through directory
     for dirpath, dirnames, filenames in os.walk(directory_path):
+        total_folders += len(dirnames)
         for filename in filenames:
             total_files += 1
-            ext = os.path.splitext(filename)[1].lower()  
+            ext = os.path.splitext(filename)[1].lower()
             file_size = os.path.getsize(os.path.join(dirpath, filename)) / (1024 * 1024)  # Size in MB
             total_size += file_size
 
@@ -26,11 +29,14 @@ def analyze_directory(directory_path, extension_list):
             if ext in extension_list:
                 extension_counts[ext] = extension_counts.get(ext, 0) + 1
                 extension_sizes[ext] = extension_sizes.get(ext, 0) + file_size
+                ready_file_paths.append(os.path.abspath(os.path.join(dirpath, filename)))  # Append absolute path
             else:
                 skipped_files_size += file_size
                 skipped_extensions[ext] = skipped_extensions.get(ext, 0) + 1
 
     # Summary for user
+    print(f"Directory Path: {directory_path}")
+    print(f"Total folders: {total_folders}")
     total_encryption_time = (total_size / 1024) / encryption_rate
     print(f"Total files: {total_files}")
     print(f"Total size: {total_size:.2f} MB")
@@ -60,6 +66,8 @@ def analyze_directory(directory_path, extension_list):
     with open('directory_analysis.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Attribute', 'Value'])
+        writer.writerow(['Target Directory', directory_path])
+        writer.writerow(['Total folders', total_folders])
         writer.writerow(['Total files', total_files])
         writer.writerow(['Total size (MB)', f"{total_size:.2f}"])
         writer.writerow(['Estimated processing time (minutes)', f"{total_encryption_time:.2f}"])
@@ -79,10 +87,10 @@ def analyze_directory(directory_path, extension_list):
             writer.writerow([ext, count])
         writer.writerow([])
         writer.writerow(['Time saved by skipping (minutes)', f"{skipped_time:.2f}"])
+        writer.writerow([])
+        writer.writerow(['Files ready for encryption:'])
+        for path in ready_file_paths:
+            writer.writerow([path])
 
     print("\nResults written to directory_analysis.csv")
-
-# Test
-directory_to_analyze = "/path/to/your/directory"
-extensions_to_check = ['.txt', '.pdf']  
-analyze_directory(directory_to_analyze, extensions_to_check)
+    return ready_file_paths
