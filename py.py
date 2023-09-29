@@ -1,96 +1,87 @@
 import os
-import csv
+from multiprocessing import Pool
+import time
+from aws_encryption_sdk import StrictAwsKmsMasterKeyProvider, KMSMasterKey
+import aws_encryption_sdk
 
-def analyze_directory(directory_path, extension_list):
-    # Initialize counters and dictionaries
-    total_files = 0
-    total_folders = 0
-    total_size = 0
-    extension_counts = {}
-    extension_sizes = {}
-    skipped_extensions = {}
-    skipped_files_size = 0
-    ready_file_paths = []  # Store absolute paths of ready files
-    encryption_rate = 0.2833  # GB/minute
+def encrypt_file(file_path):
+    try:
+        # encryption logic
+        return (file_path, True, None)
+    except Exception as e:
+        return (file_path, False, str(e))
 
-    # Convert extension list to lowercase
-    extension_list = [ext.lower() for ext in extension_list]
+def batch_files_by_data_amount(files, batch_data_amount):
+    batches = []
+    current_batch = []
+    current_batch_size = 0
 
-    # Walk through directory
-    for dirpath, dirnames, filenames in os.walk(directory_path):
-        total_folders += len(dirnames)
-        for filename in filenames:
-            total_files += 1
-            ext = os.path.splitext(filename)[1].lower()
-            file_size = os.path.getsize(os.path.join(dirpath, filename)) / (1024 * 1024)  # Size in MB
-            total_size += file_size
+    for file in files:
+        file_size = os.path.getsize(file)
+        if current_batch_size + file_size <= batch_data_amount:
+            current_batch.append(file)
+            current_batch_size += file_size
+        else:
+            batches.append(current_batch)
+            current_batch = [file]
+            current_batch_size = file_size
+    if current_batch:
+        batches.append(current_batch)
+    return batches
 
-            # Update extension count and size
-            if ext in extension_list:
-                extension_counts[ext] = extension_counts.get(ext, 0) + 1
-                extension_sizes[ext] = extension_sizes.get(ext, 0) + file_size
-                ready_file_paths.append(os.path.abspath(os.path.join(dirpath, filename)))  # Append absolute path
+def generate_report(user_id, start_time, end_time, results):
+    processed_files = [r[0] for r in results if r[1]]
+    failed_files = [(r[0], r[2]) for r in results if not r[1]]
+
+    total_runtime_seconds = end_time - start_time
+    runtime_hours = int(total_runtime_seconds / 3600)
+    runtime_minutes = (total_runtime_seconds % 3600) / 60
+
+    report = {
+        'user_id': user_id,
+        'start_time': start_time,
+        'end_time': end_time,
+        'runtime_hours': runtime_hours,
+        'runtime_minutes': runtime_minutes,
+        'total_processed_files': len(processed_files),
+        'count_failed_files': len(failed_files),
+        'number_of_batches': len(results),
+        'failed_files': failed_files
+    }
+    
+    # Print report to screen
+    for key, value in report.items():
+        if key != "failed_files":
+            print(f"{key}: {value}")
+        else:
+            print("Failed files:")
+            for file, reason in value:
+                print(f" - {file} | Reason: {reason}")
+
+    # Write report to a .txt file
+    with open('encryption_report.txt', 'w') as f:
+        for key, value in report.items():
+            if key != "failed_files":
+                f.write(f"{key}: {value}\n")
             else:
-                skipped_files_size += file_size
-                skipped_extensions[ext] = skipped_extensions.get(ext, 0) + 1
+                f.write("Failed files:\n")
+                for file, reason in value:
+                    f.write(f" - {file} | Reason: {reason}\n")
 
-    # Summary for user
-    print(f"Directory Path: {directory_path}")
-    print(f"Total folders: {total_folders}")
-    total_encryption_time = (total_size / 1024) / encryption_rate
-    print(f"Total files: {total_files}")
-    print(f"Total size: {total_size:.2f} MB")
-    print(f"Estimated time to process all files: {total_encryption_time:.2f} minutes\n")
+def process_files(files, user_id):
+    NUM_CORES = 4  # Adjust based on your EC2 instance
+    BATCH_DATA_AMOUNT = 1024 * 1024 * 100  # 100 MB; adjust as needed
 
-    ready_files_count = sum(extension_counts.values())
-    ready_files_size = sum(extension_sizes.values())
-    ready_encryption_time = (ready_files_size / 1024) / encryption_rate
-    print(f"Total files ready for encryption: {ready_files_count}")
-    print(f"Total size of files ready for encryption: {ready_files_size:.2f} MB")
-    print(f"Estimated encryption time: {ready_encryption_time:.2f} minutes\n")
+    batches = batch_files_by_data_amount(files, BATCH_DATA_AMOUNT)
 
-    print("Detailed report for files ready for encryption:")
-    for ext, count in extension_counts.items():
-        ext_size = extension_sizes[ext]
-        ext_time = (ext_size / 1024) / encryption_rate
-        print(f"Extension: {ext} | Files: {count} | Size: {ext_size:.2f} MB | Estimated time: {ext_time:.2f} minutes")
+    start_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    with Pool(processes=NUM_CORES) as pool:
+        results = pool.map(encrypt_file, [file for batch in batches for file in batch])
+    end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    
+    generate_report(user_id, start_time, end_time, results)
 
-    print("\nSkipped extensions:")
-    for ext, count in skipped_extensions.items():
-        print(f"Extension: {ext} | Files: {count}")
-
-    skipped_time = (skipped_files_size / 1024) / encryption_rate
-    print(f"\nTime saved by skipping: {skipped_time:.2f} minutes")
-
-    # Write to CSV
-    with open('directory_analysis.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Attribute', 'Value'])
-        writer.writerow(['Target Directory', directory_path])
-        writer.writerow(['Total folders', total_folders])
-        writer.writerow(['Total files', total_files])
-        writer.writerow(['Total size (MB)', f"{total_size:.2f}"])
-        writer.writerow(['Estimated processing time (minutes)', f"{total_encryption_time:.2f}"])
-        writer.writerow([])
-        writer.writerow(['Total files ready for encryption', ready_files_count])
-        writer.writerow(['Total size of files ready (MB)', f"{ready_files_size:.2f}"])
-        writer.writerow(['Estimated encryption time (minutes)', f"{ready_encryption_time:.2f}"])
-        writer.writerow([])
-        writer.writerow(['Extension', 'File count', 'Size (MB)', 'Estimated time (minutes)'])
-        for ext, count in extension_counts.items():
-            ext_size = extension_sizes[ext]
-            ext_time = (ext_size / 1024) / encryption_rate
-            writer.writerow([ext, count, f"{ext_size:.2f}", f"{ext_time:.2f}"])
-        writer.writerow([])
-        writer.writerow(['Skipped Extension', 'File count'])
-        for ext, count in skipped_extensions.items():
-            writer.writerow([ext, count])
-        writer.writerow([])
-        writer.writerow(['Time saved by skipping (minutes)', f"{skipped_time:.2f}"])
-        writer.writerow([])
-        writer.writerow(['Files ready for encryption:'])
-        for path in ready_file_paths:
-            writer.writerow([path])
-
-    print("\nResults written to directory_analysis.csv")
-    return ready_file_paths
+if __name__ == "__main__":
+    FILES_TO_PROCESS = ['/path/to/file1', '/path/to/file2', ...]  # Provide your list of files here
+    USER_ID = 'User123'  # Provide your user id here
+    process_files(FILES_TO_PROCESS, USER_ID)
