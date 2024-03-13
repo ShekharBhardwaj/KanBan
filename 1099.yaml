@@ -1,0 +1,140 @@
+title:
+  text: "Form 1099-INT"
+  x: 100
+  y: 780
+  font: "Helvetica-Bold"
+  size: 18
+
+fields:
+  payer_name:
+    label: "Payer's name"
+    x: 50
+    y: 760
+    font: "Helvetica"
+    size: 12
+
+  payer_address:
+    label: "Payer's address"
+    x: 50
+    y: 745
+    font: "Helvetica"
+    size: 12
+
+  payer_federal_identification_number:
+    label: "Payer’s federal identification number"
+    x: 50
+    y: 730
+    font: "Helvetica"
+    size: 12
+
+  recipient_name:
+    label: "Recipient's name"
+    x: 50
+    y: 715
+    font: "Helvetica"
+    size: 12
+
+  recipient_identification_number:
+    label: "Recipient's identification number"
+    x: 50
+    y: 700
+    font: "Helvetica"
+    size: 12
+
+  account_number:
+    label: "Account number"
+    x: 50
+    y: 685
+    font: "Helvetica"
+    size: 12
+
+  box1_interest_income:
+    label: "Interest income (box 1)"
+    x: 50
+    y: 670
+    font: "Helvetica"
+    size: 12
+
+  box2_early_withdrawal_penalty:
+    label: "Early withdrawal penalty (box 2)"
+    x: 50
+    y: 655
+    font: "Helvetica"
+    size: 12
+
+  box3_interest_us_savings_bonds:
+    label: "U.S. Savings Bonds and Treasury obligations (box 3)"
+    x: 50
+    y: 640
+    font: "Helvetica"
+    size: 12
+
+  box4_federal_tax_withheld:
+    label: "Federal tax withheld (box 4)"
+    x: 50
+    y: 625
+    font: "Helvetica"
+    size: 12
+
+  box5_investment_expenses:
+    label: "Investment expenses (box 5)"
+    x: 50
+    y: 610
+    font: "Helvetica"
+    size: 12
+
+  box6_foreign_tax_paid:
+    label: "Foreign tax paid (box 6)"
+    x: 50
+    y: 595
+    font: "Helvetica"
+    size: 12
+
+  box7_foreign_country_or_us_possession:
+    label: "Foreign country or U.S. possession (box 7)"
+    x: 50
+    y: 580
+    font: "Helvetica"
+    size: 12
+
+  box8_tax_exempt_interest:
+    label: "Tax-exempt interest (box 8)"
+    x: 50
+    y: 565
+    font: "Helvetica"
+    size: 12
+
+  box9_specified_private_activity_bond_interest:
+    label: "Specified private activity bond interest (box 9)"
+    x: 50
+    y: 550
+    font: "Helvetica"
+    size: 12
+
+  box10_market_discount:
+    label: "Market discount (box 10)"
+    x: 50
+    y: 535
+    font: "Helvetica"
+    size: 12
+
+  box11_bond_premium:
+    label: "Bond premium (box 11)"
+    x: 50
+    y: 520
+    font: "Helvetica"
+    size: 12
+
+  box12_bond_premium_on_tax_exempt_bond:
+    label: "Bond premium on Treasury obligations (box 12)"
+    x: 50
+    y: 505
+    font: "Helvetica"
+    size: 12
+
+  box13_bond_premium_on_tax_exempt_bond:
+    label: "Bond premium on tax-exempt bond (box 13)"
+    x: 50
+    y: 490
+    font: "Helvetica"
+    size: 12
