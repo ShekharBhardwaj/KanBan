@@ -1,38 +1,35 @@
 from Crypto.Cipher import AES
-from Crypto.Hash import SHA256
+from Crypto.Util.Padding import pad, unpad
 import binascii
 
-# Function to hash your key to the correct length
-def hash_key(your_string):
-    hasher = SHA256.new(your_string.encode())  # Hashing the string with SHA256
-    return hasher.digest()  # Returns a 32 byte key
+# Function to simulate Node.js Buffer.from() behavior for hexadecimal string to bytes
+def buffer_from_hex_string(hex_string):
+    return binascii.unhexlify(hex_string)
 
-# Encrypt function
-def encrypt_message(message, key):
-    cipher = AES.new(key, AES.MODE_EAX)  # New cipher object for encryption
-    ciphertext, tag = cipher.encrypt_and_digest(message.encode())
-    hex_ciphertext = binascii.hexlify(ciphertext).decode()
-    nonce = cipher.nonce
-    return hex_ciphertext, nonce, tag
+# Example hex string that represents your derived key
+hex_string_key = "your_hex_key_here"  # Replace this with your actual hex key
 
-# Decrypt function
-def decrypt_message(hex_ciphertext, nonce, key):
-    ciphertext = binascii.unhexlify(hex_ciphertext.encode())
-    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)  # New cipher object for decryption
-    decrypted_message = cipher.decrypt(ciphertext).decode()
-    return decrypted_message
+# Convert hex string to bytes to use as an AES key
+aes_key = buffer_from_hex_string(hex_string_key)
 
-# Your string to be used as a key and your message
-your_string = "your_password_here"
+# Assuming AES-256-CBC, the key should be 32 bytes long
+if len(aes_key) != 32:
+    raise ValueError("Key must be 32 bytes (256 bits) for AES-256-CBC.")
+
+# Initialize AES cipher with CBC mode
+# Note: You'll need an IV for AES-CBC; for demonstration, we'll generate a simple one.
+# In practice, IV should be random and unique for each encryption but doesn't need to be secret.
+iv = bytes([0]*16)  # Example static IV for demonstration; replace with a proper IV in real use
+
+cipher = AES.new(aes_key, AES.MODE_CBC, iv)
+
+# Encrypt a message
 message = "Hello, world!"
+ciphertext = cipher.encrypt(pad(message.encode('utf-8'), AES.block_size))
 
-# Hash your string to a 32 byte key
-key = hash_key(your_string)
+# Decrypt the message
+cipher_dec = AES.new(aes_key, AES.MODE_CBC, iv)
+plaintext = unpad(cipher_dec.decrypt(ciphertext), AES.block_size).decode('utf-8')
 
-# Encrypt your message
-hex_ciphertext, nonce, tag = encrypt_message(message, key)
-print(f"Hex Encrypted: {hex_ciphertext}")
-
-# Decrypt your message
-decrypted_message = decrypt_message(hex_ciphertext, nonce, key)
-print(f"Decrypted Message: {decrypted_message}")
+print("Ciphertext (Hex):", binascii.hexlify(ciphertext).decode())
+print("Decrypted Message:", plaintext)
