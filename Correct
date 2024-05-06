@@ -1,22 +1,18 @@
 import urwid
 
-def menu(title, choices):
-    body = [urwid.Text(title), urwid.Divider()]
-    for c in choices:
-        button = urwid.Button(c)
-        urwid.connect_signal(button, 'click', item_chosen, c)
-        body.append(urwid.AttrMap(button, None, focus_map='reversed'))
-    return urwid.ListBox(urwid.SimpleFocusListWalker(body))
-
-def item_chosen(button, choice):
-    response = urwid.Text([u'You chose ', choice, u'\n'])
+def menu_choice(button, choice):
+    response = urwid.Text([u'You chose: ', choice, u'\n'])
     done = urwid.Button(u'Ok')
     urwid.connect_signal(done, 'click', exit_program)
-    main.original_widget = urwid.Filler(urwid.Pile([response,
-                                                    urwid.AttrMap(done, None, focus_map='reversed')]))
+    main.original_widget = urwid.Filler(urwid.Pile([response, done]))
 
 def exit_program(button):
     raise urwid.ExitMainLoop()
 
-main = urwid.MainLoop(urwid.Filler(menu(u'Main Menu', [u'Search by SOR ID', u'General Search', u'Exit'])))
+menu_items = [urwid.Button('Option 1'), urwid.Button('Option 2'), urwid.Button('Exit')]
+for button in menu_items:
+    urwid.connect_signal(button, 'click', menu_choice, button.label)
+
+menu = urwid.ListBox(urwid.SimpleFocusListWalker(menu_items))
+main = urwid.MainLoop(urwid.Filler(menu))
 main.run()
