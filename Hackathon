@@ -1,7 +1,68 @@
- we are considering an AI-powered chatbot to reduce turnaround time. This chatbot will automate actions triggered by PagerDuty alerts, performing the series of quick checks that an engineer would typically do after waking up and logging in. For example, if a PagerDuty alert comes in at 3 a.m. about an API sending non-200 error statuses, instead of manually investigating, our AI-powered bot will step in.
+PagerDuty Alert:
 
-The bot will take intuitive actions like calling the API in production to verify if the alert is valid, gathering data on the number of failures, and determining whether the issue affects specific clients or is widespread. It will also check for recent deployments, analyze the code, and highlight potential problem areas, such as deployment changes or lines of code that could be causing the issue. Additionally, it will perform checks like confirming if this is a regional API issue.
+	•	Time: 3:00 AM
+	•	Alert: API returning non-200 status codes for the last 5 minutes.
 
-By the time you log in, the bot will have already completed these checks and provided a summarized report. From there, you can interact with the bot directly to continue troubleshooting. For instance, you could ask how many instances are running in a specific region, request the IP of an instance, verify if security groups are correctly attached, or check whether an instance has the appropriate IAM policies and access to S3 buckets. The bot will respond to these simple, English-language prompts by taking the necessary actions. It will also suggest next steps while you chat, such as offering to check whether client credentials were properly updated in the vault after a rotation.
+Engineer:
+“Hey, bot. What’s going on with the API?”
 
-This intuitive chatbot will streamline the initial investigation process and make it easier to debug issues in real-time.
+Bot:
+“I’ve checked the production API. The API has been returning 502 errors for the last 5 minutes across multiple clients. This doesn’t seem to be a false alarm.”
+
+Engineer:
+“Were there any recent deployments?”
+
+Bot:
+“Yes, there was a deployment to the API service in the East region 20 minutes ago. Here’s a list of files changed in the last deployment:”
+
+	•	api_handler.py
+	•	auth_module.js
+	•	db_connection.go
+
+Engineer:
+“Can you confirm if this issue is isolated to the East region?”
+
+Bot:
+“Yes, it appears that only the East region API is affected. The West region is functioning normally.”
+
+Engineer:
+“How many instances are running in the East region?”
+
+Bot:
+“Currently, there are 10 instances running in the East region. Instance IDs are: i-12345, i-67890, i-11223, etc.”
+
+Engineer:
+“Can you check if all instances in the East region have the correct IAM policies attached?”
+
+Bot:
+“I’ve verified that all instances have the correct IAM policies attached, providing access to the necessary resources.”
+
+Engineer:
+“Check if any of the instances are missing access to the S3 bucket ‘prod-api-logs’.”
+
+Bot:
+“Checking S3 bucket access… While I’m at it, would you like me to also check for any database issues in the East region, given that the errors may be related?”
+
+Engineer:
+“Yes, go ahead and check the database too.”
+
+Bot:
+_“Got it.
+
+	•	All instances have proper access to the ‘prod-api-logs’ S3 bucket.
+	•	I also found connectivity issues with the database in the East region starting 10 minutes ago. There are no known outages, but the database is experiencing increased latency.”_
+
+Engineer:
+“Can you pull the latest logs from the S3 bucket?”
+
+Bot:
+“Here are the most recent logs from ‘prod-api-logs’:
+
+	•	502 error encountered on /auth endpoint.
+	•	Connection timed out while reaching the database in the East region.”_
+
+Engineer:
+“Alright, escalate this issue to the on-call database team, and notify me when they respond.”
+
+Bot:
+“Escalation request sent to the database team. I’ll keep you updated once they respond.”
