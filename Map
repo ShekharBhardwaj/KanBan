@@ -1,0 +1,105 @@
+Project Roadmap for D.O.S.T (Debugging Operations Support Technician)
+
+Vision
+
+D.O.S.T is an AI-powered chatbot designed to enhance the productivity of engineers during PagerDuty alerts by automating initial investigation steps and generating actionable insights. It reduces incident response time, minimizes engineer wake-up time at night, and prevents burnout by acting as the first responder, summarizing alerts, and supporting further prompts with efficient debugging actions.
+
+Roadmap Overview (Iterative Development)
+
+Phase 1: Foundational Setup and MVP (4-6 Weeks)
+
+	•	Objective: Set up the infrastructure for D.O.S.T bot, integrate with PagerDuty, and automate essential runbook steps for initial alert verification.
+	•	Deliverables:
+	•	Integrate D.O.S.T with PagerDuty to receive alerts.
+	•	Implement initial checklist logic:
+	•	Verify if the alert is false or real.
+	•	Check if relevant API endpoints are functioning across regions (East/West).
+	•	Identify any recent changes in the git repository or AWS configurations.
+	•	Build a basic LLM-powered chatbot interface using Llama3/GPT to summarize alerts.
+	•	Create summary templates for engineers to consume quickly.
+
+Phase 2: Interactive Features and Expanded Automation (6-8 Weeks)
+
+	•	Objective: Enable D.O.S.T to interact with engineers through prompts and take actions based on requests.
+	•	Deliverables:
+	•	Add natural language prompt understanding (e.g., “D.O.S.T, check if there’s an upstream issue”).
+	•	Integrate with:
+	•	Enterprise Incident Portal to identify upstream incidents.
+	•	Monitoring tools (Datadog, Grafana) to gather real-time insights.
+	•	Develop action pipelines (e.g., “Check API status” → Collect logs → Respond with insights).
+	•	Test workflows for smooth interaction between alerts, investigation, and summary creation.
+
+Phase 3: Learning and Continuous Improvement (6 Weeks)
+
+	•	Objective: Train D.O.S.T to learn from incidents and improve over time.
+	•	Deliverables:
+	•	Integrate with internal documentation systems to provide context-aware answers.
+	•	Implement feedback loops to learn from engineers’ responses and prompts.
+	•	Enable D.O.S.T to proactively suggest next steps (e.g., “The issue seems related to a config change; would you like to rollback?”).
+	•	Measure initial KPIs like alert-to-response time and incident resolution time.
+
+Phase 4: Security, Governance, and Deployment (4 Weeks)
+
+	•	Objective: Ensure the platform is secure, scalable, and ready for production deployment.
+	•	Deliverables:
+	•	Implement role-based access control to prevent unauthorized actions.
+	•	Perform security audits on D.O.S.T’s interactions with sensitive systems (e.g., AWS).
+	•	Set up logging and monitoring for D.O.S.T’s activities.
+	•	Roll out D.O.S.T for pilot use in one SRE team for feedback.
+
+Phase 5: Full-Scale Deployment and Future Enhancements (Ongoing)
+
+	•	Objective: Expand D.O.S.T’s capabilities and roll out across all SRE teams.
+	•	Deliverables:
+	•	Add self-healing capabilities (e.g., auto-restarting services if errors are detected).
+	•	Enable multi-language support to integrate with future tools and systems.
+	•	Regularly collect and analyze KPIs (e.g., incident duration, engineer feedback).
+	•	Plan future enhancements such as anomaly detection and predictive insights.
+
+Potential Questions from VP and Suggested Answers
+
+1. How does D.O.S.T improve current operations compared to manual processes?
+
+	•	Answer: D.O.S.T automates routine verification tasks and provides instant summaries, reducing the need for engineers to manually log in during night-time alerts. This results in faster incident response times and minimizes burnout. Instead of 30-40 minutes to get started, engineers will have actionable insights within minutes.
+
+2. What are the potential risks with using an AI bot for critical operations?
+
+	•	Answer: We are mitigating risks by ensuring D.O.S.T only assists with non-destructive operations. It acts as a guide, not a decision-maker, and always leaves critical actions like rollbacks to human engineers. Additionally, we’ll implement strict access control and security checks during development.
+
+3. How do we measure success?
+
+	•	Answer: Success will be measured using KPIs such as:
+	•	Reduction in alert-to-response time (e.g., from 30 minutes to 5 minutes).
+	•	Engineer feedback scores on the effectiveness of D.O.S.T’s assistance.
+	•	Number of false alerts handled autonomously.
+	•	Improvement in engineer satisfaction and well-being over time (via surveys).
+
+4. What makes D.O.S.T different from existing solutions like runbooks or monitoring dashboards?
+
+	•	Answer: While runbooks and dashboards require manual effort to access and interpret, D.O.S.T works proactively by automating these initial steps and delivering a summarized report. It can also act dynamically with natural language prompts, enabling a conversational debugging experience.
+
+5. What challenges do you foresee in this project?
+
+	•	Answer: Challenges may include:
+	•	Natural language understanding limitations: We will fine-tune the LLM models to make the chatbot more context-aware.
+	•	Security concerns: To address this, we will restrict D.O.S.T’s access and actions with role-based permissions.
+	•	User adoption: We will pilot with a small team first and iterate based on feedback to ensure smooth adoption across all SRE teams.
+
+6. How will D.O.S.T handle complex, multi-system incidents?
+
+	•	Answer: D.O.S.T will act as a facilitator, providing engineers with relevant insights from multiple systems. It can’t fully replace human expertise but will significantly reduce the time needed to collect and interpret data from various sources, allowing engineers to focus on the problem faster.
+
+7. What is the expected time to deploy D.O.S.T for full production use?
+
+	•	Answer: We plan to complete the full development in 5 months following an iterative approach:
+	1.	Foundational setup (4-6 weeks)
+	2.	Interactive features (6-8 weeks)
+	3.	Continuous learning and pilot (6 weeks)
+	4.	Security and governance (4 weeks)
+	5.	Full-scale deployment and enhancements (Ongoing)
+
+Conclusion
+
+D.O.S.T will revolutionize the way SRE teams respond to PagerDuty alerts by reducing response times, minimizing burnout, and improving the overall debugging experience. This project aligns with our goals of enhancing engineer productivity and well-being while ensuring high availability in production systems.
+
+This roadmap, along with a structured Q&A, should position your presentation for success with the VP, emphasizing incremental value delivery and addressing any potential concerns early.
