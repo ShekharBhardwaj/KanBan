@@ -1,0 +1,29 @@
+Issue Detected & PagerDuty Alert
+              │
+              ▼
+    Alert Acknowledged by Engineer
+              │
+              ▼
+     Initial Investigation / Debugging
+              │
+              ▼
+      Escalation (if needed)
+        /        \
+     Yes          No
+     │             ▼
+     ▼         Fix Development / Code Change
+  Collaborate        │
+    with             ▼
+ Cross Teams     Code Review & Testing
+                  │
+                  ▼
+        Deployment to Production
+                  │
+                  ▼
+      Verification & Monitoring
+                  │
+                  ▼
+   Incident Resolved / Closed in PagerDuty
+                  │
+                  ▼
+ Post-mortem Analysis (if applicable)
