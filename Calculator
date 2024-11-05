@@ -1,5 +1,3 @@
-Let’s consider an example where multiple peers give positive feedback, but a single feedback provider with a higher weight (such as a Direct Manager) gives a low score. This can skew the overall score to be more negative due to the weight assigned to that single provider’s feedback.
-
 Scenario
 
 We have four categories: Peers, Partner, Direct Manager, and Skip-Level Manager. Here’s how the feedback looks:
@@ -17,30 +15,32 @@ Peers
 
 Each peer’s weight would be 0.25 / 4 = 0.0625. Calculating for each peer’s feedback:
 
-	•	Peer 1: ￼
-	•	Peer 2: ￼
-	•	Peer 3: ￼
-	•	Peer 4: ￼
+	•	Peer 1:  4 \times 0.0625 = 0.25 
+	•	Peer 2:  4.5 \times 0.0625 = 0.28125 
+	•	Peer 3:  5 \times 0.0625 = 0.3125 
+	•	Peer 4:  4.2 \times 0.0625 = 0.2625 
 
-Total for Peers: ￼
+Total for Peers:  0.25 + 0.28125 + 0.3125 + 0.2625 = 1.10625 
 
 Partner
 
-	•	Partner 1: ￼
+	•	Partner 1:  3.5 \times 0.25 = 0.875 
 
 Direct Manager
 
-	•	Direct Manager: ￼
+	•	Direct Manager:  1.5 \times 0.25 = 0.375 
 
 Skip-Level Manager
 
-	•	Skip-Level Manager: ￼
+	•	Skip-Level Manager:  3.5 \times 0.25 = 0.875 
 
 Total Weighted Score
 
 Now, adding all these together:
 
-￼
+
+\text{Total Weighted Score} = 1.10625 + 0.875 + 0.375 + 0.875 = 3.23125
+
 
 Analysis of Skewed Result
 
