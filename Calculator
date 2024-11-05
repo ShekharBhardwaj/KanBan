@@ -1,0 +1,61 @@
+Let’s consider an example where multiple peers give positive feedback, but a single feedback provider with a higher weight (such as a Direct Manager) gives a low score. This can skew the overall score to be more negative due to the weight assigned to that single provider’s feedback.
+
+Scenario
+
+We have four categories: Peers, Partner, Direct Manager, and Skip-Level Manager. Here’s how the feedback looks:
+
+	1.	Peers (4 feedback providers): Positive scores — 4, 4.5, 5, and 4.2
+	2.	Partner (1 feedback provider): Neutral score — 3.5
+	3.	Direct Manager (1 feedback provider): Low score — 1.5
+	4.	Skip-Level Manager (1 feedback provider): Neutral score — 3.5
+
+Assuming we want each category to contribute equally (0.25 weight) to the overall score, the Direct Manager’s low score could have a strong negative impact because it’s weighted at 0.25 alone, compared to the 0.25 weight shared by all the peers.
+
+Step-by-Step Calculation
+
+Peers
+
+Each peer’s weight would be 0.25 / 4 = 0.0625. Calculating for each peer’s feedback:
+
+	•	Peer 1: ￼
+	•	Peer 2: ￼
+	•	Peer 3: ￼
+	•	Peer 4: ￼
+
+Total for Peers: ￼
+
+Partner
+
+	•	Partner 1: ￼
+
+Direct Manager
+
+	•	Direct Manager: ￼
+
+Skip-Level Manager
+
+	•	Skip-Level Manager: ￼
+
+Total Weighted Score
+
+Now, adding all these together:
+
+￼
+
+Analysis of Skewed Result
+
+Even though the peers provided mostly high scores (4, 4.5, 5, and 4.2), the Direct Manager’s single low score of 1.5 has a significant negative impact on the total score because it holds a full 0.25 weight, just like the entire Peers category combined.
+
+If we calculate the average for each group individually:
+
+	•	Peers’ Average: (4 + 4.5 + 5 + 4.2) / 4 = 4.425
+	•	Overall Score without the Manager’s Score would have leaned much more positively if each category had contributed similarly based on the number of providers.
+
+How to Address This Skew
+
+If the goal is to ensure fairness while avoiding such a skew, consider:
+
+	1.	Weighted Distribution Adjustment: Adjust the weight so that no single provider holds a full 25% if the other categories have multiple contributors.
+	2.	Mixed Weight Approach: Add a buffer to heavily-weighted single inputs if they significantly differ from the rest, ensuring they don’t completely dominate the outcome.
+
+This approach can balance out the influence, making sure that one low score doesn’t disproportionately skew an otherwise positive overall result.
